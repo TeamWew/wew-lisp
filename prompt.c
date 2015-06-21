@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
   mpc_parser_t* Number   = mpc_new("number");
   mpc_parser_t* Operator = mpc_new("operator");
   mpc_parser_t* Expr     = mpc_new("expr");
-  mpc_parser_t* Wewlisp    = mpc_new("wewlisp");
+  mpc_parser_t* Wewlisp  = mpc_new("wewlisp");
 
   /* Define them with the following Language */
   mpca_lang(MPCA_LANG_DEFAULT,
@@ -71,31 +71,28 @@ int main(int argc, char** argv) {
       expr     : <number> | '(' <operator> <expr>+ ')' ;  \
       wewlisp  : /^/ <operator> <expr>+ /$/ ;             \
     ",
-    Number, Operator, Expr, Wewlisp);
+  Number, Operator, Expr, Wewlisp);
 
-    puts("wewlisp version 0.0.2");
-    puts("Press Ctrl+c to exit");
+  puts("wewlisp version 0.0.2");
+  puts("Press Ctrl+c to exit");
 
-    while(1) {
-        char* input = readline("wewlisp> ");
+  while(1) {
+    char* input = readline("wewlisp> ");
+    add_history(input);
 
-        add_history(input);
-
-        mpc_result_t r;
-        if (mpc_parse("<stdin>", input, Wewlisp, &r)) {
-            long result = eval(r.output);
-            printf("%li\n", result);
-            mpc_ast_delete(r.output);
-        }
-        else {
-            mpc_err_print(r.error);
-            mpc_err_delete(r.error);
-        }
-
-        free(input);
+    mpc_result_t r;
+    if (mpc_parse("<stdin>", input, Wewlisp, &r)) {
+      long result = eval(r.output);
+      printf("%li\n", result);
+      mpc_ast_delete(r.output);
     }
+    else {
+      mpc_err_print(r.error);
+      mpc_err_delete(r.error);
+    }
+    free(input);
+}
+  mpc_cleanup(4, Number, Operator, Expr, Wewlisp);
 
-    mpc_cleanup(4, Number, Operator, Expr, Wewlisp);
-
-    return 0;
+  return 0;
 }
